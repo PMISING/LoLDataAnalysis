@@ -3,6 +3,39 @@ import numpy as np
 import pandas as pd 
 from sklearn.linear_model import LinearRegression 
 
-df = pd.read_csv('C:/Users/peter/Downloads/players_FPL.csv')
+df = pd.read_csv("C:/Users/peter/git/Personal/LolDataAnalysis/LoLDataAnalysis/lol_tr_master-grandmaster-challenger_matches.csv")
 # I will print out the first 5 obs to make sure that the dataset looks correct
 df.head()
+# Grouping the data by matchElo and calculating the mean game duration
+grouped_data = df.groupby('matchElo')['gameDuration'].mean()
+
+# # Creating a table using matplotlib
+# plt.figure(figsize=(10, 6))
+# plt.bar(grouped_data.index, grouped_data.values)
+# plt.xlabel('Match Elo')
+# plt.ylabel('Game Duration')
+# plt.title('Average Game Duration by Match Elo')
+# plt.show()
+
+# plt.figure(figsize=(10, 6))
+# plt.scatter(df['matchElo'], df['gameDuration'])
+# plt.xlabel('Match Elo')
+# plt.ylabel('Game Duration')
+# plt.title('Game Duration by Match Elo')
+# plt.show()
+
+
+df['goldDifference'] = df['blueTotalGoldSpent'] - df['redTotalGoldSpent']
+df['blueWins'] = np.where(df['won'] == 'blue', 1, 0)
+# Calculating the probability of red or blue winning based on gold difference
+grouped_prob = df.groupby('goldDifference')['won'].value_counts(normalize=True).unstack()
+
+# Creating a table using matplotlib
+plt.figure(figsize=(10, 6))
+plt.plot(grouped_prob.index, grouped_prob['blue'], label='Blue')
+plt.plot(grouped_prob.index, grouped_prob['red'], color='red', alpha=0.5, label='Red')
+plt.xlabel('Gold Difference')
+plt.ylabel('Probability')
+plt.title('Probability of Red or Blue Winning based on Gold Difference')
+plt.legend()
+plt.show()
